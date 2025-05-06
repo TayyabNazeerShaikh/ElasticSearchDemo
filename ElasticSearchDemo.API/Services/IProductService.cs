@@ -6,6 +6,9 @@ public interface IProductService
 {
     Task CreateProductAsync(Product product);
     Task<Product> GetProductByIdAsync(string id);
+    Task<IEnumerable<Product>> GetAllProductsAsync();
+    Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category);
+    Task<IEnumerable<Product>> SearchProductsAsync(string searchTerm);
     Task UpdateProductAsync(Product product);
     Task DeleteProductAsync(string id);
     Task BulkCreateProductsAsync(IEnumerable<Product> products);

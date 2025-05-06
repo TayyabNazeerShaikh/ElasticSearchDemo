@@ -77,4 +77,49 @@ public class ProductService : IProductService
         if (!response.IsValid)
             throw new Exception($"Failed to bulk delete products: {response.OriginalException.Message}");
     }
+
+    public async Task<IEnumerable<Product>> GetAllProductsAsync()
+    {
+        var response = await _elasticClient.SearchAsync<Product>(s => s
+            .Query(q => q.MatchAll())
+            .Size(1000)); // Adjust size as needed
+
+        if (!response.IsValid)
+            throw new Exception($"Failed to get all products: {response.OriginalException.Message}");
+
+        return response.Documents;
+    }
+
+    public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category)
+    {
+        var response = await _elasticClient.SearchAsync<Product>(s => s
+            .Query(q => q
+                .Term(t => t
+                    .Field(f => f.Category)
+                    .Value(category)))
+            .Size(1000)); 
+
+        if (!response.IsValid)
+            throw new Exception($"Failed to get products by category: {response.OriginalException.Message}");
+
+        return response.Documents;
+    }
+
+    public async Task<IEnumerable<Product>> SearchProductsAsync(string searchTerm)
+    {
+        var response = await _elasticClient.SearchAsync<Product>(s => s
+            .Query(q => q
+                .MultiMatch(m => m
+                    .Fields(f => f
+                        .Field(p => p.Name)
+                        .Field(p => p.Description))
+                    .Query(searchTerm)
+                    .Type(TextQueryType.BestFields)))
+            .Size(1000)); // Adjust size as needed
+
+        if (!response.IsValid)
+            throw new Exception($"Failed to search products: {response.OriginalException.Message}");
+
+        return response.Documents;
+    }
 }

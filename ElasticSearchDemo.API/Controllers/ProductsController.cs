@@ -18,51 +18,142 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] Product product)
     {
-        await _productService.CreateProductAsync(product);
-        return Ok();
+        try
+        {
+            await _productService.CreateProductAsync(product);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to create product: {ex.Message}");
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProduct(string id)
     {
-        var product = await _productService.GetProductByIdAsync(id);
-        if (product == null)
-            return NotFound();
-        return Ok(product);
+        try
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+                return NotFound();
+            return Ok(product);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to get product: {ex.Message}");
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllProducts()
+    {
+        try
+        {
+            var products = await _productService.GetAllProductsAsync();
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to get all products: {ex.Message}");
+        }
+    }
+
+    [HttpGet("category/{category}")]
+    public async Task<IActionResult> GetProductsByCategory(string category)
+    {
+        try
+        {
+            var products = await _productService.GetProductsByCategoryAsync(category);
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to get products by category: {ex.Message}");
+        }
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProducts([FromQuery] string searchTerm)
+    {
+        try
+        {
+            var products = await _productService.SearchProductsAsync(searchTerm);
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to search products: {ex.Message}");
+        }
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateProduct([FromBody] Product product)
     {
-        await _productService.UpdateProductAsync(product);
-        return Ok();
+        try
+        {
+            await _productService.UpdateProductAsync(product);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to update product: {ex.Message}");
+        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(string id)
     {
-        await _productService.DeleteProductAsync(id);
-        return Ok();
+        try
+        {
+            await _productService.DeleteProductAsync(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to delete product: {ex.Message}");
+        }
     }
 
     [HttpPost("bulk")]
     public async Task<IActionResult> BulkCreateProducts([FromBody] IEnumerable<Product> products)
     {
-        await _productService.BulkCreateProductsAsync(products);
-        return Ok();
+        try
+        {
+            await _productService.BulkCreateProductsAsync(products);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to bulk create products: {ex.Message}");
+        }
     }
 
     [HttpPut("bulk")]
     public async Task<IActionResult> BulkUpdateProducts([FromBody] IEnumerable<Product> products)
     {
-        await _productService.BulkUpdateProductsAsync(products);
-        return Ok();
+        try
+        {
+            await _productService.BulkUpdateProductsAsync(products);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to bulk update products: {ex.Message}");
+        }
     }
 
     [HttpDelete("bulk")]
     public async Task<IActionResult> BulkDeleteProducts([FromBody] IEnumerable<string> ids)
     {
-        await _productService.BulkDeleteProductsAsync(ids);
-        return Ok();
+        try
+        {
+            await _productService.BulkDeleteProductsAsync(ids);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to bulk delete products: {ex.Message}");
+        }
     }
 }
